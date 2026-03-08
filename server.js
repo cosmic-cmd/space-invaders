@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 8080;
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 
-const dbPath = path.join(DATA_DIR, 'invaders.db');
+const dbPath = '/data/invaders.db';
 
 // The DB file is created automatically here if it's missing
 const db = new sqlite3.Database(dbPath, (err) => {
