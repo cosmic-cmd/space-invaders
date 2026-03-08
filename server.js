@@ -10,12 +10,6 @@ const PORT = process.env.PORT || 8080;
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 
-// Ensure the data directory exists (Critical for the PVC mount)
-const DATA_DIR = '/data';
-if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
-}
-
 const dbPath = path.join(DATA_DIR, 'invaders.db');
 
 // The DB file is created automatically here if it's missing
