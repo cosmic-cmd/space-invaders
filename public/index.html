@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>SPACE INVADERS // AEGIS</title>
+    <title>SPACE INVADERS</title>
     <style>
         body {
             background: #050505;
@@ -40,8 +40,28 @@
 <body>
     <h1>MISSION: SPACE INVADERS</h1>
     <div id="game-container">
+        <div id="system-overlay"
+            style="position: absolute; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10;">
+            <div id="setup-screen">
+                <h2>INITIALIZE AGENT</h2>
+                <input type="text" id="agent-input" placeholder="ENTER ID..." maxlength="10"
+                    style="background: black; color: #00eeff; border: 1px solid #00eeff; padding: 10px; font-family: monospace; outline: none;">
+                <button onclick="bootSystem()"
+                    style="background: #00eeff; color: black; border: none; padding: 10px 20px; margin-top: 10px; font-weight: bold; cursor: pointer;">BOOT
+                    ENGINE</button>
+            </div>
+            <div id="scoreboard-screen" style="display: none;">
+                <h2 style="color: #ff0055;">TOP AGENTS</h2>
+                <div id="high-scores-list" style="margin: 20px 0;"></div>
+                <button onclick="location.reload()"
+                    style="background: #00eeff; color: black; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer;">REBOOT
+                    SYSTEM [R]</button>
+            </div>
+        </div>
+
         <div class="hud">
-            <div>AGENT: <span id="agent-id">CMD</span></div>
+            <div>AGENT: <span id="agent-id">???</span></div>
+            <div>LVL: <span id="level-val">01</span></div>
             <div>WEAPON: <span id="weapon-status">CALIBRATING...</span></div>
             <div>SCORE: <span id="score-val">0000</span></div>
         </div>
