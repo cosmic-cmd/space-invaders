@@ -4,63 +4,28 @@
 <head>
     <meta charset="UTF-8">
     <title>SPACE INVADERS</title>
-    <style>
-        body {
-            background: #050505;
-            color: #00eeff;
-            font-family: 'Courier New', monospace;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        #game-container {
-            position: relative;
-            border: 2px solid #333;
-            margin-top: 20px;
-            box-shadow: 0 0 20px rgba(0, 238, 255, 0.2);
-        }
-
-        canvas {
-            background: #000;
-            display: block;
-        }
-
-        .hud {
-            position: absolute;
-            top: 10px;
-            width: 100%;
-            display: flex;
-            justify-content: space-around;
-            pointer-events: none;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <h1>MISSION: SPACE INVADERS</h1>
+    <h1>SYSTEM STATUS: ONLINE</h1>
     <div id="game-container">
-        <div id="system-overlay"
-            style="position: absolute; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10;">
-            <div id="setup-screen">
-                <h2>INITIALIZE AGENT</h2>
-                <input type="text" id="agent-input" placeholder="ENTER ID..." maxlength="10"
-                    style="background: black; color: #00eeff; border: 1px solid #00eeff; padding: 10px; font-family: monospace; outline: none;">
-                <button onclick="bootSystem()"
-                    style="background: #00eeff; color: black; border: none; padding: 10px 20px; margin-top: 10px; font-weight: bold; cursor: pointer;">BOOT
-                    ENGINE</button>
-            </div>
-            <div id="scoreboard-screen" style="display: none;">
-                <h2 style="color: #ff0055;">TOP AGENTS</h2>
-                <div id="high-scores-list" style="margin: 20px 0;"></div>
-                <button onclick="location.reload()"
-                    style="background: #00eeff; color: black; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer;">REBOOT
-                    SYSTEM [R]</button>
+        <div id="system-overlay">
+            <div class="terminal-window" id="boot-screen">
+                <h2 style="color: #ff0055;">TOP AGENTS - DATABASE</h2>
+                <div id="leaderboard-data" style="margin: 15px 0; max-height: 200px; overflow-y: auto;">
+                    LOADING ENCRYPTED DATA...
+                </div>
+                <hr style="border: 0.5px solid #00eeff;">
+                <h3>INITIALIZE NEW AGENT</h3>
+                <input type="text" id="agent-input" placeholder="ENTER ID..." maxlength="10">
+                <br>
+                <button onclick="bootSystem()">BOOT ENGINE</button>
             </div>
         </div>
 
         <div class="hud">
-            <div>AGENT: <span id="agent-id">???</span></div>
+            <div>AGENT: <span id="agent-id">---</span></div>
             <div>LVL: <span id="level-val">01</span></div>
             <div>WEAPON: <span id="weapon-status">CALIBRATING...</span></div>
             <div>SCORE: <span id="score-val">0000</span></div>

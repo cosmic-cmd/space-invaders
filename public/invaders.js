@@ -10,30 +10,47 @@ let currentLevel = 1;
 const levelEl = document.getElementById('level-val');
 const overlay = document.getElementById('system-overlay');
 const agentIdEl = document.getElementById('agent-id');
+// 0. Connection & Initial Load Logic
+const statusEl = document.querySelector('h1');
+
+function updateStatus() {
+    if (navigator.onLine) {
+        statusEl.innerHTML = 'SYSTEM STATUS: <span class="status-online">ONLINE</span>';
+    } else {
+        statusEl.innerHTML = 'SYSTEM STATUS: <span class="status-offline">OFFLINE (LOCAL MODE)</span>';
+    }
+}
+
 
 // 1. BOOT ENGINE: Handles the Name Entry
 function bootSystem() {
     const input = document.getElementById('agent-input').value.trim();
     if (input) {
-        agentIdEl.innerText = input.toUpperCase();
-        overlay.style.display = 'none';
-        gameLoop(); // Start the loop only after name entry
+        document.getElementById('agent-id').innerText = input.toUpperCase();
+        document.getElementById('system-overlay').style.display = 'none';
+        gameLoop();
     }
 }
 
 // 2. FETCH HIGH SCORES: Pulls from your PVC-backed SQLite
-async function showScoreboard() {
+async function fetchLeaderboard() {
+    const list = document.getElementById('leaderboard-data');
     try {
-        const response = await fetch('/api/scores');
-        const scores = await response.json();
-        const list = document.getElementById('high-scores-list');
-        list.innerHTML = scores.map(s => `<div>${s.name} - ${s.score} [${s.weapon}]</div>`).join('');
+        const res = await fetch('/api/scores');
+        const data = await res.json();
 
-        document.getElementById('setup-screen').style.display = 'none';
-        document.getElementById('scoreboard-screen').style.display = 'block';
-        overlay.style.display = 'flex';
-    } catch (e) {
-        console.error("Scoreboard Offline");
+        if (data.length === 0) {
+            list.innerHTML = "DATABASE EMPTY - NO AGENTS RECORDED";
+        } else {
+            list.innerHTML = data.map(s => `
+                <div class="high-score-entry">
+                    <span>${s.name}</span>
+                    <span>${s.score}</span>
+                </div>
+            `).join('');
+        }
+    } catch (err) {
+        list.innerHTML = "OFFLINE: DATABASE UNREACHABLE";
     }
 }
 
@@ -175,10 +192,10 @@ class Bullet {
     // 5. LASER DRAWING: Modified Bullet.draw()
     draw() {
         if (this.isLaser) {
-            ctx.fillStyle = '#ffffff'; // White core for the laser
-            ctx.shadowBlur = 15;
+            ctx.fillStyle = '#ffffff'; // White core
+            ctx.shadowBlur = 20;
             ctx.shadowColor = THEME_CYAN;
-            ctx.fillRect(this.x - 2, this.y, 4, 15); // Long beam shape
+            ctx.fillRect(this.x - 3, this.y, 6, 20); // Thick Beam
             ctx.shadowBlur = 0;
         } else {
             ctx.fillStyle = THEME_CYAN;
@@ -186,6 +203,15 @@ class Bullet {
             ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
             ctx.fill();
         }
+    }
+}
+
+function explode(x, y, color) {
+    for (let i = 0; i < 15; i++) {
+        const p = new Particle(x, y, color);
+        p.speedY = (Math.random() - 0.5) * 6; // Multidirectional spray
+        p.speedX = (Math.random() - 0.5) * 6;
+        particles.push(p);
     }
 }
 
@@ -274,6 +300,7 @@ function gameLoop() {
                     bullet.y < invader.y + invader.height) {
 
                     invader.alive = false;
+                    explode(invader.x + 15, invader.y + 10, '#ff0055'); // Trigger Explosion
                     aegis.bullets.splice(bIndex, 1);
 
                     // Update HUD Score
@@ -297,33 +324,45 @@ function gameLoop() {
 function triggerGameOver() {
     gameOver = true;
     const finalScore = parseInt(scoreEl.innerText);
+    const agentName = document.getElementById('agent-id').innerText;
 
+    // Visual Game Over
     ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-
     ctx.fillStyle = '#ff0055';
-    ctx.font = '40px Courier New';
-    ctx.fillText("MISSION FAILED", canvas.width / 2 - 160, canvas.height / 2);
+    ctx.font = '40px Orbitron';
+    ctx.fillText("MISSION FAILED", canvas.width / 2 - 180, canvas.height / 2);
 
-    ctx.fillStyle = THEME_CYAN;
-    ctx.font = '20px Courier New';
-    ctx.fillText("PRESS [R] TO REBOOT SYSTEM", canvas.width / 2 - 140, canvas.height / 2 + 50);
+    // Save and Refresh Data
+    saveGame(agentName, finalScore, weaponEl.innerText);
 
-    saveGame(finalScore, weaponEl.innerText);
-    setTimeout(showScoreboard, 2000); // Show scores after a short delay
+    // Show the leaderboard again after 2 seconds
+    setTimeout(() => {
+        fetchLeaderboard(); // Refresh the list with the new score
+        document.getElementById('setup-screen').style.display = 'none';
+        document.getElementById('scoreboard-screen').style.display = 'block';
+        document.getElementById('system-overlay').style.display = 'flex';
+    }, 2000);
 }
 
 
-function saveGame(finalScore, currentWeapon) {
-    fetch('/api/scores', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            name: 'CMD', // You can pull this from your #agent-id span later
-            score: finalScore,
-            weapon: currentWeapon
-        })
-    });
+function saveGame(agentName, finalScore, currentWeapon) {
+    // Only attempt fetch if online to avoid console noise offline
+    if (navigator.onLine) {
+        fetch('/api/scores', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                name: agentName,
+                score: finalScore,
+                weapon: currentWeapon
+            })
+        }).catch(err => console.log("Local mode: Score not saved."));
+    }
 }
 
-gameLoop();
+// 3. Initialization
+window.addEventListener('load', () => {
+    updateStatus();
+    fetchLeaderboard(); // Load scores immediately on boot
+});
