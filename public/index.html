@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>SPACE INVADERS // AEGIS</title>
+    <style>
+        body {
+            background: #050505;
+            color: #00eeff;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #game-container {
+            position: relative;
+            border: 2px solid #333;
+            margin-top: 20px;
+            box-shadow: 0 0 20px rgba(0, 238, 255, 0.2);
+        }
+
+        canvas {
+            background: #000;
+            display: block;
+        }
+
+        .hud {
+            position: absolute;
+            top: 10px;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>MISSION: SPACE INVADERS</h1>
+    <div id="game-container">
+        <div class="hud">
+            <div>AGENT: <span id="agent-id">CMD</span></div>
+            <div>WEAPON: <span id="weapon-status">CALIBRATING...</span></div>
+            <div>SCORE: <span id="score-val">0000</span></div>
+        </div>
+        <canvas id="invadersCanvas" width="800" height="600"></canvas>
+    </div>
+    <script src="invaders.js"></script>
+</body>
+
+</html>

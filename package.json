@@ -1,0 +1,16 @@
+{
+    "name": "space-invaders-aegis",
+    "version": "1.0.0",
+    "description": "Space Invaders AEGIS - High Performance Terminal Combat",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js",
+        "dev": "node --watch server.js"
+    },
+    "dependencies": {
+        "express": "^4.18.2",
+        "sqlite3": "^5.1.7"
+    },
+    "author": "AEGIS-CMD",
+    "license": "MIT"
+}
